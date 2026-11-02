@@ -1910,3 +1910,16 @@ libs.bitcoin.networks.particl = {
   scriptHash: 0x3c,
   wif: 0x6c,
 };
+
+// Solana uses ed25519 keys (see solana-util.js), these secp256k1 network
+// parameters are only a placeholder so the common BIP32 plumbing keeps working.
+libs.bitcoin.networks.solana = {
+  messagePrefix: 'unused',
+  bip32: {
+    public: 0x0488b21e,
+    private: 0x0488ade4,
+  },
+  pubKeyHash: 0x00,
+  scriptHash: 0x05,
+  wif: 0x80,
+};

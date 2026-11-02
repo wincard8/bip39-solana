@@ -2,6 +2,39 @@
 
 A tool for converting BIP39 mnemonic phrases to addresses and private keys.
 
+## This fork: Solana (SOL) support
+
+This is a fork of [iancoleman/bip39](https://github.com/iancoleman/bip39) that
+adds a `SOL - Solana` entry to the coin list. Nothing else about the tool is
+changed.
+
+Solana uses ed25519 keys derived with SLIP-0010, so it does not go through
+BIP32/secp256k1. With `SOL - Solana` selected, every row of the address table is
+one Solana account, derived from:
+
+```
+m/44'/501'/<account>'/0'
+```
+
+| Column | Value for Solana |
+| --- | --- |
+| Derivation path | `m/44'/501'/<account>'/0'` (all levels hardened) |
+| Address | base58 of the 32 byte ed25519 public key |
+| Public key | hex of the 32 byte ed25519 public key |
+| Private key | base58 of the 64 byte secret key (`seed ‖ public key`), the format Phantom/Solflare/Solana CLI import |
+
+Test vector, BIP39 test mnemonic `abandon abandon ... about` with an empty
+passphrase (seed `5eb00bbd...e9e38e4`):
+
+| Account | Address |
+| --- | --- |
+| 0 | `HAgk14JpMQLgt6rVgv7cBQFJWFto5Dqxi472uT3DKpqk` |
+| 1 | `Hh8QwFUA6MtVu1qAoq12ucvFHNwCcVTV7hpWjeY1Hztb` |
+| 2 | `7WktogJEd2wQ9eH2oWusmcoFTgeYi6rS632UviTBJ2jm` |
+
+The implementation lives in `src/js/solana-util.js` and the `SOL - Solana`
+branch in `src/js/index.js`.
+
 ## Online Version
 
 https://iancoleman.io/bip39/
@@ -14,6 +47,9 @@ Download `bip39-standalone.html` from
 Open the file in a browser by double clicking it.
 
 This can be compiled from source using the command `python compile.py`
+
+The GitHub Pages build of this fork is `docs/index.html`, produced by running
+`python compile.py` and copying `bip39-standalone.html` over it.
 
 ## Usage
 

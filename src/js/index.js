@@ -980,6 +980,11 @@
             path += coin + "'/";
             path += account + "'/";
             path += change;
+            // Solana (ed25519) derives accounts from a fully hardened path:
+            // m/44'/501'/account'/change'
+            if (networks[DOM.network.val()].name == "SOL - Solana") {
+                path = "m/" + purpose + "'/" + coin + "'/" + account + "'/" + change + "'";
+            }
             DOM.bip44path.val(path);
             var derivationPath = DOM.bip44path.val();
             console.log("Using derivation path from BIP44 tab: " + derivationPath);
@@ -1417,6 +1422,22 @@
 
                     indexText = path;
                     address = libs.zoobcUtil.getZBCAddress(publicKey, 'ZBC');
+                }
+
+                // Solana is different: ed25519 keys derived with SLIP-0010,
+                // every row of the table is a separate account:
+                // m/44'/501'/<account>'/0'
+                if (networks[DOM.network.val()].name == "SOL - Solana") {
+                    var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
+                    var coin = parseIntNoNaN(DOM.bip44coin.val(), 501);
+                    var path = "m/";
+                        path += purpose + "'/";
+                        path += coin + "'/" + index + "'/0'";
+                    var solanaKeypair = SolanaGetKeypair(path, seed);
+                    privkey = solanaKeypair.secretKey;
+                    pubkey = solanaKeypair.publicKey.toString("hex");
+                    address = solanaKeypair.address;
+                    indexText = path;
                 }
 
                 // Segwit addresses are different
@@ -3461,6 +3482,13 @@
             onSelect: function() {
                 network = libs.bitcoin.networks.smileycoin;
                 setHdCoin(59);
+            },
+        },
+        {
+            name: "SOL - Solana",
+            onSelect: function() {
+                network = libs.bitcoin.networks.solana;
+                setHdCoin(501);
             },
         },
         {
