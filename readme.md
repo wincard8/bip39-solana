@@ -2,11 +2,17 @@
 
 A tool for converting BIP39 mnemonic phrases to addresses and private keys.
 
-## This fork: Solana (SOL) support
+## This fork: Solana (SOL) support and a BIP86 (Taproot) tab
 
 This is a fork of [iancoleman/bip39](https://github.com/iancoleman/bip39) that
-adds a `SOL - Solana` entry to the coin list. Nothing else about the tool is
-changed.
+adds two things:
+
+- a `SOL - Solana` entry in the coin list
+- a `BIP86` tab that derives Taproot (`bc1p...`) addresses
+
+Everything else about the tool is unchanged.
+
+### Solana (SOL)
 
 Solana uses ed25519 keys derived with SLIP-0010, so it does not go through
 BIP32/secp256k1. With `SOL - Solana` selected, every row of the address table is
@@ -34,6 +40,32 @@ passphrase (seed `5eb00bbd...e9e38e4`):
 
 The implementation lives in `src/js/solana-util.js` and the `SOL - Solana`
 branch in `src/js/index.js`.
+
+### Bitcoin Taproot (BIP86)
+
+The `BIP86` tab derives the standard single key Taproot path and encodes the
+address as bech32m witness v1:
+
+```
+m/86'/0'/0'/0/<index>      receiving
+m/86'/0'/0'/1/<index>      change
+```
+
+For every derived key the tool computes the BIP341 output key
+`Q = P + int(tagged_hash("TapTweak", P.x)) * G` and encodes `Q.x` as `bc1p...`.
+The "Public Key" column shows that 32 byte x-only output key, the private key
+column shows the WIF of the internal key.
+
+Test vectors, BIP39 test mnemonic `abandon abandon ... about`:
+
+| Path | Address |
+| --- | --- |
+| `m/86'/0'/0'/0/0` | `bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr` |
+| `m/86'/0'/0'/0/1` | `bc1p4qhjn9zdvkux4e44uhx8tc55attvtyu358kutcqkudyccelu0was9fqzwh` |
+| `m/86'/0'/0'/1/0` | `bc1p3qkhfews2uk44qtvauqyr2ttdsw7svhkl9nkm9s9c3x4ax5h60wqwruhk7` |
+
+For any coin without bech32 support the tab reports that BIP86 is unavailable.
+The implementation lives in `src/js/taproot-util.js`.
 
 ## Online Version
 

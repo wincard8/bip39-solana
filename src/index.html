@@ -424,6 +424,9 @@
                         <li id="bip84-tab">
                             <a href="#bip84" role="tab" data-toggle="tab">BIP84</a>
                         </li>
+                        <li id="bip86-tab">
+                            <a href="#bip86" role="tab" data-toggle="tab">BIP86</a>
+                        </li>
                         <li id="bip141-tab">
                             <a href="#bip141" role="tab" data-toggle="tab">BIP141</a>
                         </li>
@@ -793,6 +796,97 @@
                                 </div>
                             </form>
                         </div>
+                        <div id="bip86" class="tab-pane">
+                            <form class="form-horizontal" role="form">
+                                <br>
+                                <div class="bip86-unavailable hidden">
+                                    <div class="form-group">
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                            <p>BIP86 (Taproot) is unavailable for this coin.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bip86-available">
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-10">
+                                        <p>
+                                            For more info see the
+                                            <a href="https://github.com/bitcoin/bips/blob/master/bip-0086.mediawiki" target="_blank">BIP86 spec</a>.
+                                            Addresses are bech32m encoded witness v1 (Taproot) outputs.
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="purpose-bip86" class="col-sm-2 control-label">
+                                            Purpose
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input id="purpose-bip86" type="text" class="purpose form-control" value="86" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="coin-bip86" class="col-sm-2 control-label">
+                                            Coin
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input id="coin-bip86" type="text" class="coin form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="account-bip86" class="col-sm-2 control-label">
+                                            Account
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input id="account-bip86" type="text" class="account form-control" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="change-bip86" class="col-sm-2 control-label">
+                                            External / Internal
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input id="change-bip86" type="text" class="change form-control" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <p>The account extended keys can be used for importing to most BIP86 compatible wallets.</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="account-xprv" class="col-sm-2 control-label">
+                                            <span>Account Extended Private Key</span>
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <textarea id="account-xprv-bip86" type="text" class="account-xprv private-data form-control" readonly data-show-qr autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="account-xpub" class="col-sm-2 control-label">
+                                            <span>Account Extended Public Key</span>
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <textarea id="account-xpub-bip86" type="text" class="account-xpub form-control" readonly data-show-qr autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <p>The BIP32 derivation path and extended keys are the basis for the derived addresses.</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bip86-path" class="col-sm-2 control-label">BIP32 Derivation Path</label>
+                                        <div class="col-sm-10">
+                                            <input id="bip86-path" type="text" class="path form-control" value="m/86'/0'/0'/0" readonly="readonly">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     <form class="form-horizontal" role="form">
                         <div class="form-group">
@@ -1149,6 +1243,7 @@
         <script src="js/fio-util.js"></script>
         <script src="js/xwc-util.js"></script>
 <script src="js/solana-util.js"></script>
+<script src="js/taproot-util.js"></script>
         <script src="js/sjcl-bip39.js"></script>
         <script src="js/wordlist_english.js"></script>
         <script src="js/wordlist_japanese.js"></script>

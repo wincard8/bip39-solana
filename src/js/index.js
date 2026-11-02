@@ -68,6 +68,7 @@
     DOM.bip44tab = $("#bip44-tab");
     DOM.bip49tab = $("#bip49-tab");
     DOM.bip84tab = $("#bip84-tab");
+    DOM.bip86tab = $("#bip86-tab");
     DOM.bip141tab = $("#bip141-tab");
     DOM.bip32panel = $("#bip32");
     DOM.bip44panel = $("#bip44");
@@ -98,6 +99,15 @@
     DOM.bip84accountXprv = $("#bip84 .account-xprv");
     DOM.bip84accountXpub = $("#bip84 .account-xpub");
     DOM.bip84change = $("#bip84 .change");
+    DOM.bip86unavailable = $("#bip86 .bip86-unavailable");
+    DOM.bip86available = $("#bip86 .bip86-available");
+    DOM.bip86path = $("#bip86-path");
+    DOM.bip86purpose = $("#bip86 .purpose");
+    DOM.bip86coin = $("#bip86 .coin");
+    DOM.bip86account = $("#bip86 .account");
+    DOM.bip86accountXprv = $("#bip86 .account-xprv");
+    DOM.bip86accountXpub = $("#bip86 .account-xpub");
+    DOM.bip86change = $("#bip86 .change");
     DOM.bip85 = $('.bip85');
     DOM.showBip85 = $('.showBip85');
     DOM.bip85Field = $('.bip85Field');
@@ -169,6 +179,8 @@
         DOM.bip49change.on("input", calcForDerivationPath);
         DOM.bip84account.on("input", calcForDerivationPath);
         DOM.bip84change.on("input", calcForDerivationPath);
+        DOM.bip86account.on("input", calcForDerivationPath);
+        DOM.bip86change.on("input", calcForDerivationPath);
         DOM.bip85application.on('input', calcBip85);
         DOM.bip85mnemonicLanguage.on('change', calcBip85);
         DOM.bip85mnemonicLength.on('change', calcBip85);
@@ -583,6 +595,15 @@
             return;
         }
         showSegwitAvailable();
+        // Taproot addresses need a bech32 network
+        if (bip86TabSelected() && !networkHasSegwit()) {
+            DOM.bip86available.addClass("hidden");
+            DOM.bip86unavailable.removeClass("hidden");
+            hidePending();
+            return;
+        }
+        DOM.bip86available.removeClass("hidden");
+        DOM.bip86unavailable.addClass("hidden");
         // Get the derivation path
         var derivationPath = getDerivationPath();
         var errorText = findDerivationPathErrors(derivationPath);
@@ -599,6 +620,9 @@
         }
         else if (bip84TabSelected()) {
             displayBip84Info();
+        }
+        else if (bip86TabSelected()) {
+            displayBip86Info();
         }
         displayBip32Info();
     }
@@ -1020,6 +1044,21 @@
             console.log("Using derivation path from BIP84 tab: " + derivationPath);
             return derivationPath;
         }
+        else if (bip86TabSelected()) {
+            var purpose = parseIntNoNaN(DOM.bip86purpose.val(), 86);
+            var coin = parseIntNoNaN(DOM.bip86coin.val(), 0);
+            var account = parseIntNoNaN(DOM.bip86account.val(), 0);
+            var change = parseIntNoNaN(DOM.bip86change.val(), 0);
+            var path = "m/";
+            path += purpose + "'/";
+            path += coin + "'/";
+            path += account + "'/";
+            path += change;
+            DOM.bip86path.val(path);
+            var derivationPath = DOM.bip86path.val();
+            console.log("Using derivation path from BIP86 tab: " + derivationPath);
+            return derivationPath;
+        }
         else if (bip32TabSelected()) {
             var derivationPath = DOM.bip32path.val();
             console.log("Using derivation path from BIP32 tab: " + derivationPath);
@@ -1149,6 +1188,24 @@
         // Display the extended keys
         DOM.bip84accountXprv.val(accountXprv);
         DOM.bip84accountXpub.val(accountXpub);
+    }
+
+    function displayBip86Info() {
+        // Get the derivation path for the account
+        var purpose = parseIntNoNaN(DOM.bip86purpose.val(), 86);
+        var coin = parseIntNoNaN(DOM.bip86coin.val(), 0);
+        var account = parseIntNoNaN(DOM.bip86account.val(), 0);
+        var path = "m/";
+        path += purpose + "'/";
+        path += coin + "'/";
+        path += account + "'/";
+        // Calculate the account extended keys
+        var accountExtendedKey = calcBip32ExtendedKey(path);
+        var accountXprv = accountExtendedKey.toBase58();
+        var accountXpub = accountExtendedKey.neutered().toBase58();
+        // Display the extended keys
+        DOM.bip86accountXprv.val(accountXprv);
+        DOM.bip86accountXpub.val(accountXpub);
     }
 
     function displayBip32Info() {
@@ -1438,6 +1495,15 @@
                     pubkey = solanaKeypair.publicKey.toString("hex");
                     address = solanaKeypair.address;
                     indexText = path;
+                }
+
+                // Taproot (BIP86) addresses are bech32m encoded witness v1
+                // outputs of the tweaked key
+                if (bip86TabSelected()) {
+                    var taprootHrp = ("bech32" in network) ? network.bech32 : "bc";
+                    var taproot = TaprootAddressFromPublicKey(keyPair.getPublicKeyBuffer(), taprootHrp);
+                    address = taproot.address;
+                    pubkey = taproot.outputKeyHex;
                 }
 
                 // Segwit addresses are different
@@ -2169,6 +2235,10 @@
         return DOM.bip84tab.hasClass("active");
     }
 
+    function bip86TabSelected() {
+        return DOM.bip86tab.hasClass("active");
+    }
+
     function bip141TabSelected() {
         return DOM.bip141tab.hasClass("active");
     }
@@ -2177,6 +2247,7 @@
         DOM.bip44coin.val(coinValue);
         DOM.bip49coin.val(coinValue);
         DOM.bip84coin.val(coinValue);
+        DOM.bip86coin.val(coinValue);
     }
 
     function showSegwitAvailable() {
