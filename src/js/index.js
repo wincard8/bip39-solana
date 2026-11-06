@@ -1009,6 +1009,11 @@
             if (networks[DOM.network.val()].name == "SOL - Solana") {
                 path = "m/" + purpose + "'/" + coin + "'/" + account + "'/" + change + "'";
             }
+            // Sui (ed25519) uses an extra hardened address index level:
+            // m/44'/784'/account'/change'/0'
+            if (networks[DOM.network.val()].name == "SUI - Sui") {
+                path = "m/" + purpose + "'/" + coin + "'/" + account + "'/" + change + "'/0'";
+            }
             DOM.bip44path.val(path);
             var derivationPath = DOM.bip44path.val();
             console.log("Using derivation path from BIP44 tab: " + derivationPath);
@@ -1494,6 +1499,22 @@
                     privkey = solanaKeypair.secretKey;
                     pubkey = solanaKeypair.publicKey.toString("hex");
                     address = solanaKeypair.address;
+                    indexText = path;
+                }
+
+                // Sui is different: ed25519 keys derived with SLIP-0010,
+                // every row of the table is a separate account:
+                // m/44'/784'/<account>'/0'/0'
+                if (networks[DOM.network.val()].name == "SUI - Sui") {
+                    var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
+                    var coin = parseIntNoNaN(DOM.bip44coin.val(), 784);
+                    var path = "m/";
+                        path += purpose + "'/";
+                        path += coin + "'/" + index + "'/0'/0'";
+                    var suiKeypair = SuiGetKeypair(path, seed);
+                    privkey = suiKeypair.secretKey;
+                    pubkey = suiKeypair.publicKey.toString("hex");
+                    address = suiKeypair.address;
                     indexText = path;
                 }
 
@@ -3560,6 +3581,13 @@
             onSelect: function() {
                 network = libs.bitcoin.networks.solana;
                 setHdCoin(501);
+            },
+        },
+        {
+            name: "SUI - Sui",
+            onSelect: function() {
+                network = libs.bitcoin.networks.sui;
+                setHdCoin(784);
             },
         },
         {

@@ -1923,3 +1923,15 @@ libs.bitcoin.networks.solana = {
   scriptHash: 0x05,
   wif: 0x80,
 };
+
+// Sui also uses ed25519 keys (see sui-util.js), placeholder parameters again.
+libs.bitcoin.networks.sui = {
+  messagePrefix: 'unused',
+  bip32: {
+    public: 0x0488b21e,
+    private: 0x0488ade4,
+  },
+  pubKeyHash: 0x00,
+  scriptHash: 0x05,
+  wif: 0x80,
+};

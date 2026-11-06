@@ -2,12 +2,13 @@
 
 A tool for converting BIP39 mnemonic phrases to addresses and private keys.
 
-## This fork: Solana (SOL) support and a BIP86 (Taproot) tab
+## This fork: Solana (SOL) and Sui (SUI) support, plus a BIP86 (Taproot) tab
 
 This is a fork of [iancoleman/bip39](https://github.com/iancoleman/bip39) that
-adds two things:
+adds three things:
 
 - a `SOL - Solana` entry in the coin list
+- a `SUI - Sui` entry in the coin list
 - a `BIP86` tab that derives Taproot (`bc1p...`) addresses
 
 Everything else about the tool is unchanged.
@@ -40,6 +41,41 @@ passphrase (seed `5eb00bbd...e9e38e4`):
 
 The implementation lives in `src/js/solana-util.js` and the `SOL - Solana`
 branch in `src/js/index.js`.
+
+### Sui (SUI)
+
+Sui also uses SLIP-0010 ed25519 keys. Every row of the address table is one Sui
+account, derived from:
+
+```
+m/44'/784'/<account>'/0'/0'
+```
+
+A Sui address is the blake2b-256 hash of the one byte signature scheme flag
+(`0x00` for ed25519) followed by the 32 byte public key:
+
+```
+0x + hex(blake2b-256(0x00 ‖ public_key))
+```
+
+| Column | Value for Sui |
+| --- | --- |
+| Derivation path | `m/44'/784'/<account>'/0'/0'` (all levels hardened) |
+| Address | `0x` plus 64 hex characters of the blake2b-256 hash |
+| Public key | hex of the 32 byte ed25519 public key |
+| Private key | `suiprivkey1...` bech32 export (`flag ‖ secret`), the format the Sui CLI and Sui wallets import |
+
+Test vector, BIP39 test mnemonic `abandon abandon ... about`:
+
+| Account | Address |
+| --- | --- |
+| 0 | `0x5e93a736d04fbb25737aa40bee40171ef79f65fae833749e3c089fe7cc2161f1` |
+| 1 | `0x082d099250999ab8450a9ef3a962edf9e2449e1045be32ba5a0f2c6117ff7167` |
+| 2 | `0xf195b51c63745071891b1f53170cac2cab2a49da6ee1fe8eabe50989234c8119` |
+
+The addresses and the `suiprivkey` strings match `@mysten/sui` byte for byte.
+The implementation (including a small BLAKE2b-256) lives in
+`src/js/sui-util.js`.
 
 ### Bitcoin Taproot (BIP86)
 
