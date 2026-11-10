@@ -1492,9 +1492,13 @@
                 if (networks[DOM.network.val()].name == "SOL - Solana") {
                     var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
                     var coin = parseIntNoNaN(DOM.bip44coin.val(), 501);
+                    // the Account field is the first account shown in the table,
+                    // the External/Internal field is the last hardened level
+                    var solAccount = parseIntNoNaN(DOM.bip44account.val(), 0) + index;
+                    var solChange = parseIntNoNaN(DOM.bip44change.val(), 0);
                     var path = "m/";
                         path += purpose + "'/";
-                        path += coin + "'/" + index + "'/0'";
+                        path += coin + "'/" + solAccount + "'/" + solChange + "'";
                     var solanaKeypair = SolanaGetKeypair(path, seed);
                     privkey = solanaKeypair.secretKey;
                     pubkey = solanaKeypair.publicKey.toString("hex");
@@ -1508,9 +1512,13 @@
                 if (networks[DOM.network.val()].name == "SUI - Sui") {
                     var purpose = parseIntNoNaN(DOM.bip44purpose.val(), 44);
                     var coin = parseIntNoNaN(DOM.bip44coin.val(), 784);
+                    // the Account field is the first account shown in the table,
+                    // the External/Internal field is the change level
+                    var suiAccount = parseIntNoNaN(DOM.bip44account.val(), 0) + index;
+                    var suiChange = parseIntNoNaN(DOM.bip44change.val(), 0);
                     var path = "m/";
                         path += purpose + "'/";
-                        path += coin + "'/" + index + "'/0'/0'";
+                        path += coin + "'/" + suiAccount + "'/" + suiChange + "'/0'";
                     var suiKeypair = SuiGetKeypair(path, seed);
                     privkey = suiKeypair.secretKey;
                     pubkey = suiKeypair.publicKey.toString("hex");

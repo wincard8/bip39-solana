@@ -26,7 +26,9 @@ function SolanaBase58Encode(bytes) {
         }
     }
     var chars = "";
-    for (var k = 0; k < bytes.length && bytes[k] === 0; k++) {
+    // every leading zero byte becomes one '1', except the last byte which is
+    // part of the number itself (otherwise an all-zero input would gain one)
+    for (var k = 0; k < bytes.length - 1 && bytes[k] === 0; k++) {
         chars += alphabet[0];
     }
     for (var m = digits.length - 1; m >= 0; m--) {

@@ -21,12 +21,16 @@ BIP32/secp256k1. With `SOL - Solana` selected, every row of the address table is
 one Solana account, derived from:
 
 ```
-m/44'/501'/<account>'/0'
+m/44'/501'/<account>'/<change>'
 ```
+
+The `Account` field is the **first account shown in the table** (row *n* is
+`account + n`), `External / Internal` is the last hardened level and defaults to
+`0`, which is the standard wallet path.
 
 | Column | Value for Solana |
 | --- | --- |
-| Derivation path | `m/44'/501'/<account>'/0'` (all levels hardened) |
+| Derivation path | `m/44'/501'/<account>'/<change>'` (all levels hardened) |
 | Address | base58 of the 32 byte ed25519 public key |
 | Public key | hex of the 32 byte ed25519 public key |
 | Private key | base58 of the 64 byte secret key (`seed ‖ public key`), the format Phantom/Solflare/Solana CLI import |
@@ -49,8 +53,11 @@ Sui also uses SLIP-0010 ed25519 keys. Every row of the address table is one Sui
 account, derived from:
 
 ```
-m/44'/784'/<account>'/0'/0'
+m/44'/784'/<account>'/<change>'/0'
 ```
+
+The `Account` field is the **first account shown in the table** (row *n* is
+`account + n`), `External / Internal` is the change level and defaults to `0`.
 
 A Sui address is the blake2b-256 hash of the one byte signature scheme flag
 (`0x00` for ed25519) followed by the 32 byte public key:
@@ -61,7 +68,7 @@ A Sui address is the blake2b-256 hash of the one byte signature scheme flag
 
 | Column | Value for Sui |
 | --- | --- |
-| Derivation path | `m/44'/784'/<account>'/0'/0'` (all levels hardened) |
+| Derivation path | `m/44'/784'/<account>'/<change>'/0'` (all levels hardened) |
 | Address | `0x` plus 64 hex characters of the blake2b-256 hash |
 | Public key | hex of the 32 byte ed25519 public key |
 | Private key | `suiprivkey1...` bech32 export (`flag ‖ secret`), the format the Sui CLI and Sui wallets import |
@@ -131,6 +138,32 @@ Test vectors, BIP39 test mnemonic `abandon abandon ... about`:
 
 For any coin without bech32 support the tab reports that BIP86 is unavailable.
 The implementation lives in `src/js/taproot-util.js`.
+
+### Verification
+
+Every value below was compared against an independent implementation, not just
+against itself:
+
+| Feature | Reference | Coverage |
+| --- | --- | --- |
+| SOL | `bip_utils` `Bip44Coins.SOLANA` | 2 mnemonics × (with/without passphrase) × accounts 0/1/5, address + pubkey + secret key |
+| SUI | `@mysten/sui` and `bip_utils` + `hashlib.blake2b` | same matrix, address + pubkey + `suiprivkey` |
+| OSMO | `bip_utils` `Bip44Coins.OSMOSIS` | same matrix, indices 0/1/2 and account 1 |
+| BIP86 | BIP86 spec test vectors + `bip_utils` `Bip86Coins.BITCOIN` | m/86'/0'/0'/0/0..2 and m/86'/0'/0'/1/0 |
+| base58 | `bip_utils` `Base58Encoder` | leading-zero inputs (`00`, `0000`, `0001`, 32 zero bytes) |
+| BLAKE2b-256 | Python `hashlib.blake2b(digest_size=32)` | 0/3/33/128/129/200 byte inputs |
+
+### Known limitations
+
+- Row indexes are hardened levels, so they must be below `2^31`. Entering a
+  starting index of `2147483648` or more makes that row fail to generate (the
+  same limit as any hardened BIP32 path in this tool).
+- `BIP38` encryption only applies to WIF private keys. For the ed25519 coins
+  (SOL/SUI) and the Cosmos coins the private key column is shown unencrypted;
+  the checkbox has no effect there.
+- On the `BIP32` tab the derived rows for these coins still come from the coin's
+  own BIP44 path, while the "BIP32 Extended Key" fields above show the key for
+  the path typed in the BIP32 tab. Use the `BIP44` tab for these coins.
 
 ## Online Version
 
