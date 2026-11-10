@@ -2,13 +2,14 @@
 
 A tool for converting BIP39 mnemonic phrases to addresses and private keys.
 
-## This fork: Solana (SOL) and Sui (SUI) support, plus a BIP86 (Taproot) tab
+## This fork: Solana (SOL), Sui (SUI) and Osmosis (OSMO) support, plus a BIP86 (Taproot) tab
 
 This is a fork of [iancoleman/bip39](https://github.com/iancoleman/bip39) that
-adds three things:
+adds four things:
 
 - a `SOL - Solana` entry in the coin list
 - a `SUI - Sui` entry in the coin list
+- an `OSMO - Osmosis` entry in the coin list
 - a `BIP86` tab that derives Taproot (`bc1p...`) addresses
 
 Everything else about the tool is unchanged.
@@ -76,6 +77,34 @@ Test vector, BIP39 test mnemonic `abandon abandon ... about`:
 The addresses and the `suiprivkey` strings match `@mysten/sui` byte for byte.
 The implementation (including a small BLAKE2b-256) lives in
 `src/js/sui-util.js`.
+
+### Osmosis (OSMO)
+
+Osmosis is a Cosmos SDK chain, so it uses secp256k1 BIP44 keys with coin type
+118 and the `osmo` bech32 prefix. The address is the bech32 encoding of
+`ripemd160(sha256(compressed_pubkey))`:
+
+```
+m/44'/118'/0'/0/<index>
+```
+
+| Column | Value for Osmosis |
+| --- | --- |
+| Derivation path | `m/44'/118'/0'/0/<index>` (same path as Cosmos Hub) |
+| Address | `osmo1...` bech32 of the 20 byte hash160 |
+| Public key | hex of the 33 byte compressed secp256k1 public key |
+| Private key | hex of the 32 byte secp256k1 private key |
+
+Test vector, BIP39 test mnemonic `abandon abandon ... about`:
+
+| Index | Address |
+| --- | --- |
+| 0 | `osmo19rl4cm2hmr8afy4kldpxz3fka4jguq0a5m7df8` |
+| 1 | `osmo1jrkmdcwgq94uaamx6zax2luewlhf7u4k5r4pqs` |
+| 2 | `osmo1kng7tv83qesgvv2ze7hxlw4urfrjk8vqggjsme` |
+
+Addresses match `bip_utils` (`Bip44Coins.OSMOSIS`) exactly. The branch lives in
+`src/js/index.js` and reuses `CosmosBufferToAddress` from `cosmos-util.js`.
 
 ### Bitcoin Taproot (BIP86)
 

@@ -1591,6 +1591,13 @@
                      privkey = keyPair.d.toBuffer().toString("hex");
                 }
 
+                if (networks[DOM.network.val()].name == "OSMO - Osmosis") {
+                     const hrp = "osmo";
+                     address = CosmosBufferToAddress(keyPair.getPublicKeyBuffer(), hrp);
+                     pubkey = keyPair.getPublicKeyBuffer().toString("hex");
+                     privkey = keyPair.d.toBuffer().toString("hex");
+                }
+
                 if (networks[DOM.network.val()].name == "XWC - Whitecoin"){
                     address = XWCbufferToAddress(keyPair.getPublicKeyBuffer());
                     pubkey = XWCbufferToPublic(keyPair.getPublicKeyBuffer());
@@ -3348,6 +3355,13 @@
             onSelect: function() {
                 network = libs.bitcoin.networks.onixcoin;
                 setHdCoin(174);
+            },
+        },
+        {
+            name: "OSMO - Osmosis",
+            onSelect: function() {
+                network = libs.bitcoin.networks.bitcoin;
+                setHdCoin(118);
             },
         },
         {
